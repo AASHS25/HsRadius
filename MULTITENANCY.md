@@ -26,16 +26,21 @@ Dua tenant bisa punya pelanggan dengan username sama → **tabrakan**. Selain it
 FreeRADIUS membaca tabel RADIUS **langsung via SQL**, bukan lewat aplikasi
 Laravel, jadi scoping aplikasi saja tidak cukup.
 
-**Strategi terpilih: scoping berbasis NAS.** Setiap NAS (router) milik satu
-tenant, dan FreeRADIUS selalu tahu NAS asal request (`%{Client-IP-Address}` /
-`nasipaddress`). Maka:
+**Strategi terpilih (terimplementasi): username & groupname global-unik.**
+`customers.username` sudah unik global dan groupname RADIUS = `pkg-{id}`
+(id paket unik global), jadi **tidak mungkin tabrakan** dan **FreeRADIUS tidak
+perlu diubah** — autentikasi tetap benar. Multi-tenant di lapisan RADIUS murni
+soal *scoping di aplikasi*:
 
-- Tambah `tenant_id` ke tabel RADIUS (`nas`, `radcheck`, `radreply`,
-  `radusergroup`, `radgroupcheck`, `radgroupreply`, `radacct`, `radpostauth`).
-- Ubah query FreeRADIUS (`raddb/mods-config/sql/main/.../queries.conf`) agar
-  meng-`JOIN nas` dan memfilter berdasarkan tenant pemilik NAS pemanggil.
-- Username tetap di-namespace per tenant (mis. `username` unik global dengan
-  prefiks/realm) sebagai lapisan kedua agar aman.
+- `tenant_id` ditambahkan ke tabel yang ditulis aplikasi (`radcheck`,
+  `radreply`, `radgroupcheck`, `radgroupreply`, `radusergroup`) + trait
+  `BelongsToTenant` (RadiusService mengisi otomatis).
+- `radacct` & `radpostauth` (ditulis FreeRADIUS) di-*scope* saat dibaca lewat
+  username ∈ pelanggan tenant (`BelongsToTenantViaUsername`).
+
+Konsekuensi: username pelanggan unik **lintas semua tenant** (trade-off demi
+kesederhanaan & nol perubahan FreeRADIUS). Bila kelak butuh username sama
+antar-tenant, baru beralih ke scoping berbasis NAS + namespacing (Alternatif).
 
 Alternatif (didokumentasikan, tidak dipakai): **database-per-tenant**
 (`stancl/tenancy`) — isolasi paling kuat, tapi FreeRADIUS harus menunjuk banyak
@@ -68,7 +73,7 @@ DB (1 instance per tenant / routing kompleks) → beban operasional tinggi.
 | **1. Fondasi** | Tabel `tenants`, `Tenant` model, `users.tenant_id`+`role`, trait+scope, `CurrentTenant`, seeder super-admin+tenant demo | ✅ **Selesai (PR ini)** |
 | **2. Isolasi data app** | `tenant_id` di `customers/packages/vouchers/invoices/nas`, trait `BelongsToTenant`, middleware `ResolveTenant` (dari user login), auto-scope query | ✅ **Selesai (PR ini)** |
 | **3. Role & akses** | Gate super-admin/admin/operator, route ber-`can:`, menu sidebar ber-`@can`, seeder operator | ✅ **Selesai (PR ini)** |
-| **4. RADIUS tenant-aware** | `tenant_id` ke tabel RADIUS, update `RadiusService`, ubah query FreeRADIUS berbasis NAS, namespacing username | ⏳ |
+| **4. RADIUS tenant-aware** | `tenant_id` + scope di tabel provisioning RADIUS; `radacct`/`radpostauth` ter-scope via username. Username global-unik → FreeRADIUS tak diubah | ✅ **Selesai (PR ini)** |
 | **5. Panel Landlord** | UI kelola tenant + onboarding (buat tenant + subdomain + admin) | ⏳ |
 | **6. Billing tenant** | Paket langganan SaaS, invoice tenant, auto-suspend, halaman pembayaran | ⏳ |
 
@@ -76,7 +81,8 @@ DB (1 instance per tenant / routing kompleks) → beban operasional tinggi.
 
 `tenant_id` (FK → `tenants.id`) ditambahkan ke:
 `users, customers, packages, vouchers, invoices, nas, radcheck, radreply,
-radusergroup, radgroupcheck, radgroupreply, radacct, radpostauth`.
+radusergroup, radgroupcheck, radgroupreply`. Tabel `radacct` & `radpostauth`
+di-scope via username pelanggan (tanpa kolom `tenant_id`).
 
 `super_admin` memiliki `tenant_id = NULL` (lintas-tenant).
 

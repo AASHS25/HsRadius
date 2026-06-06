@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenantViaUsername;
 use Illuminate\Database\Eloquent\Model;
 
 class RadPostAuth extends Model
 {
+    use BelongsToTenantViaUsername;
+
     protected $table = 'radpostauth';
     public $timestamps = false;
 

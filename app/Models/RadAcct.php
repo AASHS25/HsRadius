@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenantViaUsername;
 use Illuminate\Database\Eloquent\Model;
 
 class RadAcct extends Model
 {
+    use BelongsToTenantViaUsername;
+
     protected $table = 'radacct';
     protected $primaryKey = 'radacctid';
     public $timestamps = false;
