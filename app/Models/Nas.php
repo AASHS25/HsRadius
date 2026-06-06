@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Nas extends Model
 {
+    use BelongsToTenant;
+
     protected $table = 'nas';
 
     protected $fillable = [
-        'nasname', 'shortname', 'type', 'ports', 'secret', 'server',
+        'tenant_id', 'nasname', 'shortname', 'type', 'ports', 'secret', 'server',
         'community', 'description', 'api_host', 'api_port', 'api_username',
         'api_password', 'api_ssl', 'is_active',
     ];

@@ -38,6 +38,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        // From here on, all seeded data belongs to the demo tenant.
+        app(\App\Tenancy\CurrentTenant::class)->set($demoTenant);
+
         // Create sample NAS
         $nas = Nas::create([
             'nasname' => '192.168.1.1',

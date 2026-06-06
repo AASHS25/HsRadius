@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Package extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'name', 'type', 'rate_up', 'rate_down', 'burst_up', 'burst_down',
+        'tenant_id', 'name', 'type', 'rate_up', 'rate_down', 'burst_up', 'burst_down',
         'burst_threshold_up', 'burst_threshold_down', 'burst_time_up', 'burst_time_down',
         'priority', 'validity_type', 'validity_value', 'validity_unit',
         'limit_type', 'quota_bytes', 'price', 'shared_users',

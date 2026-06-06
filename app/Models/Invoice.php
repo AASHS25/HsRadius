@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Invoice extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'invoice_number', 'customer_id', 'package_id', 'amount',
+        'tenant_id', 'invoice_number', 'customer_id', 'package_id', 'amount',
         'paid_amount', 'status', 'due_date', 'paid_date',
         'payment_method', 'notes',
     ];

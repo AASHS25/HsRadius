@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Voucher extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'code', 'package_id', 'status', 'batch_name',
+        'tenant_id', 'code', 'package_id', 'status', 'batch_name',
         'used_by', 'used_at', 'expires_at',
         'validity_value', 'validity_unit',
     ];

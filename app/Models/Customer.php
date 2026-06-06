@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Tenancy\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'username', 'password', 'fullname', 'email', 'phone', 'address',
+        'tenant_id', 'username', 'password', 'fullname', 'email', 'phone', 'address',
         'service_type', 'package_id', 'nas_id', 'status', 'start_date',
         'expiry_date', 'static_ip', 'mac_address', 'notes', 'pppoe_caller_id',
     ];

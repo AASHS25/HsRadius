@@ -45,9 +45,8 @@ DB (1 instance per tenant / routing kompleks) → beban operasional tinggi.
 
 | Konteks | Cara |
 |---|---|
-| Panel web | **Subdomain** → `tenantA.panel.com` dipetakan ke `tenants.domain` |
+| Panel web | **Akun user yang login** → `users.tenant_id` (satu domain untuk semua tenant, tanpa subdomain) |
 | API/MikroTik (RADIUS) | **NAS/Client IP** → `nas.tenant_id` |
-| Sesi login admin | `users.tenant_id` user yang login |
 
 ## 5. Komponen yang Dibangun
 
@@ -56,7 +55,7 @@ DB (1 instance per tenant / routing kompleks) → beban operasional tinggi.
 3. **`BelongsToTenant` trait + `TenantScope`** (global scope) + auto-isi
    `tenant_id` saat create. Diterapkan ke semua model milik tenant.
 4. **`CurrentTenant`** (singleton) + **middleware `ResolveTenant`** (set tenant
-   dari subdomain / user login).
+   dari **user yang login**; super-admin tanpa tenant = akses lintas-tenant).
 5. **Panel Landlord**: CRUD tenant, kelola langganan, suspend/aktifkan.
 6. **Billing tenant**: paket langganan SaaS, invoice ke tenant, auto-suspend
    bila nunggak (terpisah dari billing pelanggan milik tenant).
@@ -67,7 +66,7 @@ DB (1 instance per tenant / routing kompleks) → beban operasional tinggi.
 | Fase | Isi | Status |
 |---|---|---|
 | **1. Fondasi** | Tabel `tenants`, `Tenant` model, `users.tenant_id`+`role`, trait+scope, `CurrentTenant`, seeder super-admin+tenant demo | ✅ **Selesai (PR ini)** |
-| **2. Isolasi data app** | Tambah `tenant_id` ke `customers/packages/vouchers/invoices`, terapkan trait, middleware `ResolveTenant` (subdomain), audit semua controller | ⏳ Berikutnya |
+| **2. Isolasi data app** | `tenant_id` di `customers/packages/vouchers/invoices/nas`, trait `BelongsToTenant`, middleware `ResolveTenant` (dari user login), auto-scope query | ✅ **Selesai (PR ini)** |
 | **3. Role & akses** | Gate/policy: super-admin vs admin vs operator; sembunyikan menu Landlord dari tenant | ⏳ |
 | **4. RADIUS tenant-aware** | `tenant_id` ke tabel RADIUS, update `RadiusService`, ubah query FreeRADIUS berbasis NAS, namespacing username | ⏳ |
 | **5. Panel Landlord** | UI kelola tenant + onboarding (buat tenant + subdomain + admin) | ⏳ |
