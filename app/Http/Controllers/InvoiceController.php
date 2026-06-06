@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Package;
+use App\Services\RadiusService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -129,7 +130,41 @@ class InvoiceController extends Controller
             'payment_method' => 'manual',
         ]);
 
+        $this->reactivateAfterPayment($invoice);
+
         return redirect()->route('invoices.index')
-            ->with('success', 'Invoice berhasil ditandai sebagai lunas.');
+            ->with('success', 'Invoice lunas. Pelanggan diaktifkan & masa aktif diperpanjang.');
+    }
+
+    /**
+     * After payment, release isolir: reactivate the customer and extend the
+     * subscription by the package validity. Reused by the payment webhook.
+     */
+    public function reactivateAfterPayment(Invoice $invoice): void
+    {
+        $customer = $invoice->customer;
+        if (! $customer) {
+            return;
+        }
+
+        $package = $invoice->package ?: $customer->package;
+        $base = ($customer->expiry_date && $customer->expiry_date->isFuture())
+            ? $customer->expiry_date->copy()
+            : now();
+
+        if ($package && $package->validity_type === 'limited') {
+            $customer->expiry_date = match ($package->validity_unit) {
+                'minutes' => $base->addMinutes($package->validity_value),
+                'hours' => $base->addHours($package->validity_value),
+                'days' => $base->addDays($package->validity_value),
+                'months' => $base->addMonths($package->validity_value),
+                default => $customer->expiry_date,
+            };
+        }
+
+        $customer->status = 'active';
+        $customer->save();
+
+        app(RadiusService::class)->activateCustomer($customer);
     }
 }

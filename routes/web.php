@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NasController;
@@ -88,5 +89,18 @@ Route::middleware('auth')->group(function () {
         Route::get('traffic', [ReportController::class, 'traffic'])->name('traffic');
         Route::get('revenue', [ReportController::class, 'revenue'])->name('revenue');
         Route::get('customers', [ReportController::class, 'customers'])->name('customers');
+    });
+});
+
+// Customer self-service portal (separate "customer" guard)
+Route::prefix('portal')->name('portal.')->group(function () {
+    Route::get('login', [CustomerPortalController::class, 'showLogin'])->name('login');
+    Route::post('login', [CustomerPortalController::class, 'login']);
+
+    Route::middleware('auth:customer')->group(function () {
+        Route::get('/', [CustomerPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('invoices', [CustomerPortalController::class, 'invoices'])->name('invoices');
+        Route::post('renew', [CustomerPortalController::class, 'renew'])->name('renew');
+        Route::post('logout', [CustomerPortalController::class, 'logout'])->name('logout');
     });
 });

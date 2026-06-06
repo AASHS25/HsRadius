@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Tenancy\BelongsToTenant;
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Customer extends Model
+class Customer extends Model implements AuthenticatableContract
 {
-    use BelongsToTenant;
+    use AuthenticatableTrait, BelongsToTenant;
 
     protected $fillable = [
         'tenant_id', 'username', 'password', 'fullname', 'email', 'phone', 'address',
