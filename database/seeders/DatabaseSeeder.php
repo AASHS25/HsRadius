@@ -14,11 +14,28 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create admin user
+        // Super-admin (landlord) — manages all tenants, tenant_id = null
         \App\Models\User::factory()->create([
-            'name' => 'Administrator',
+            'name' => 'Super Admin',
             'email' => 'admin@hsradius.local',
             'password' => Hash::make('admin123'),
+            'role' => 'super_admin',
+        ]);
+
+        // Demo tenant + its admin (Phase 1 scaffold)
+        $demoTenant = \App\Models\Tenant::create([
+            'name' => 'Demo ISP',
+            'slug' => 'demo',
+            'status' => 'active',
+            'plan' => 'pro',
+        ]);
+
+        \App\Models\User::factory()->create([
+            'name' => 'Admin Demo ISP',
+            'email' => 'admin@demo.local',
+            'password' => Hash::make('admin123'),
+            'tenant_id' => $demoTenant->id,
+            'role' => 'admin',
         ]);
 
         // Create sample NAS
