@@ -38,9 +38,10 @@ Route::middleware('auth')->group(function () {
 
     // Vouchers
     Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
-    Route::get('vouchers/generate', [VoucherController::class, 'showGenerate'])->name('vouchers.generate');
+    Route::get('vouchers/generate', [VoucherController::class, 'createBatch'])->name('vouchers.generate');
     Route::post('vouchers/generate', [VoucherController::class, 'generate'])->name('vouchers.store');
-    Route::post('vouchers/print', [VoucherController::class, 'printVouchers'])->name('vouchers.print');
+    Route::post('vouchers/print', [VoucherController::class, 'print'])->name('vouchers.print');
+    Route::delete('vouchers/bulk-delete', [VoucherController::class, 'bulkDelete'])->name('vouchers.bulk-delete');
     Route::delete('vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
     Route::delete('vouchers/batch/{batchName}', [VoucherController::class, 'destroyBatch'])->name('vouchers.destroy-batch');
 

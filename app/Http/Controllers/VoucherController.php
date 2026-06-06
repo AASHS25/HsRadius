@@ -174,4 +174,30 @@ class VoucherController extends Controller
         return redirect()->route('vouchers.index')
             ->with('success', "{$deleted} voucher dalam batch berhasil dihapus.");
     }
+
+    /**
+     * Delete multiple selected vouchers (used ones are skipped).
+     */
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'voucher_ids' => 'required|array',
+            'voucher_ids.*' => 'integer',
+        ]);
+
+        $vouchers = Voucher::whereIn('id', $validated['voucher_ids'])->get();
+        $deletable = $vouchers->where('status', '!=', 'used');
+        $usedCount = $vouchers->count() - $deletable->count();
+
+        foreach ($deletable as $voucher) {
+            $voucher->delete();
+        }
+
+        $message = $deletable->count() . ' voucher berhasil dihapus.';
+        if ($usedCount > 0) {
+            $message .= " {$usedCount} voucher terpakai dilewati.";
+        }
+
+        return redirect()->route('vouchers.index')->with('success', $message);
+    }
 }
