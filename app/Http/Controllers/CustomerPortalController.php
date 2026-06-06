@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\RadAcct;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -68,6 +69,27 @@ class CustomerPortalController extends Controller
             ->with('package')->latest()->paginate(10);
 
         return view('portal.invoices', compact('customer', 'invoices'));
+    }
+
+    public function pay(Invoice $invoice)
+    {
+        $customer = Auth::guard('customer')->user();
+
+        if ($invoice->customer_id !== $customer->id) {
+            abort(403);
+        }
+        if ($invoice->status === 'paid') {
+            return redirect()->route('portal.invoices')->with('info', 'Tagihan ini sudah lunas.');
+        }
+
+        $url = app(PaymentService::class)->createCheckoutUrl($invoice);
+
+        if (! $url) {
+            return redirect()->route('portal.invoices')
+                ->with('error', 'Pembayaran online belum diaktifkan oleh admin. Silakan hubungi admin.');
+        }
+
+        return redirect()->away($url);
     }
 
     public function renew()

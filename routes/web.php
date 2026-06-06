@@ -7,10 +7,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NasController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
@@ -90,6 +92,12 @@ Route::middleware('auth')->group(function () {
         Route::get('revenue', [ReportController::class, 'revenue'])->name('revenue');
         Route::get('customers', [ReportController::class, 'customers'])->name('customers');
     });
+
+    // Settings (admin only) — payment & WhatsApp credentials per tenant
+    Route::middleware('can:manage-settings')->group(function () {
+        Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
+        Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+    });
 });
 
 // Customer self-service portal (separate "customer" guard)
@@ -100,7 +108,11 @@ Route::prefix('portal')->name('portal.')->group(function () {
     Route::middleware('auth:customer')->group(function () {
         Route::get('/', [CustomerPortalController::class, 'dashboard'])->name('dashboard');
         Route::get('invoices', [CustomerPortalController::class, 'invoices'])->name('invoices');
+        Route::post('invoices/{invoice}/pay', [CustomerPortalController::class, 'pay'])->name('invoices.pay');
         Route::post('renew', [CustomerPortalController::class, 'renew'])->name('renew');
         Route::post('logout', [CustomerPortalController::class, 'logout'])->name('logout');
     });
 });
+
+// Payment gateway webhook (no auth/CSRF; verified by signature)
+Route::post('webhook/payment/tripay', [PaymentController::class, 'tripayCallback'])->name('webhook.payment.tripay');

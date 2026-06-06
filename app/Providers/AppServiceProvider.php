@@ -28,5 +28,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-vouchers', fn (User $user) => $user->isAdmin() || $user->isOperator());
         Gate::define('manage-sessions', fn (User $user) => $user->isAdmin() || $user->isOperator());
         Gate::define('view-reports', fn (User $user) => $user->isAdmin() || $user->isOperator());
+        Gate::define('manage-settings', fn (User $user) => $user->isAdmin());
     }
 }

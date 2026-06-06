@@ -484,6 +484,12 @@
                 </ul>
             </div>
             @endcan
+
+            @can('manage-settings')
+            <a href="{{ route('settings.edit') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i> Pengaturan
+            </a>
+            @endcan
         </div>
     </nav>
 

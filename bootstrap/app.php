@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\ResolveTenant::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'webhook/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -8,7 +8,7 @@
 <div class="card"><div class="card-body p-0"><div class="table-responsive">
     <table class="table mb-0">
         <thead>
-            <tr><th>No. Invoice</th><th>Paket</th><th>Jumlah</th><th>Jatuh Tempo</th><th>Status</th></tr>
+            <tr><th>No. Invoice</th><th>Paket</th><th>Jumlah</th><th>Jatuh Tempo</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
             @forelse($invoices as $inv)
@@ -24,9 +24,17 @@
                             <span class="badge bg-warning text-dark">Belum bayar</span>
                         @endif
                     </td>
+                    <td class="text-end">
+                        @if($inv->status !== 'paid')
+                            <form method="POST" action="{{ route('portal.invoices.pay', $inv) }}">
+                                @csrf
+                                <button class="btn btn-sm btn-success"><i class="bi bi-qr-code me-1"></i>Bayar</button>
+                            </form>
+                        @endif
+                    </td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="text-center text-muted py-4">Belum ada tagihan.</td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-4">Belum ada tagihan.</td></tr>
             @endforelse
         </tbody>
     </table>
