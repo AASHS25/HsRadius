@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,5 +46,22 @@ class SettingsController extends Controller
         }
 
         return redirect()->route('settings.edit')->with('success', 'Pengaturan berhasil disimpan.');
+    }
+
+    public function testWa(Request $request)
+    {
+        $data = $request->validate(['test_phone' => 'required|string']);
+        $tenantId = Auth::user()->tenant_id;
+
+        $ok = app(WhatsAppService::class)->send(
+            $tenantId,
+            $data['test_phone'],
+            'Tes notifikasi WhatsApp dari HsRadius. Jika Anda menerima pesan ini, konfigurasi sudah benar.'
+        );
+
+        return back()->with(
+            $ok ? 'success' : 'error',
+            $ok ? 'Pesan tes terkirim.' : 'Gagal mengirim. Pastikan API key, provider, dan nomor sudah benar.'
+        );
     }
 }

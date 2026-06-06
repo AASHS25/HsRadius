@@ -69,4 +69,21 @@
 
     <button class="btn btn-primary">Simpan Pengaturan</button>
 </form>
+
+<div class="card mt-4">
+    <div class="card-header">Tes Kirim WhatsApp</div>
+    <div class="card-body">
+        <form method="POST" action="{{ route('settings.test-wa') }}" class="row g-2 align-items-end" style="max-width: 520px;">
+            @csrf
+            <div class="col-8">
+                <label class="form-label small">Nomor tujuan</label>
+                <input name="test_phone" class="form-control" placeholder="08xxxxxxxxxx" required>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-success w-100"><i class="bi bi-send me-1"></i>Tes Kirim</button>
+            </div>
+        </form>
+        <div class="small text-muted mt-2">Simpan pengaturan WhatsApp dulu sebelum tes.</div>
+    </div>
+</div>
 @endsection

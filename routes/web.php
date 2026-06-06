@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:manage-settings')->group(function () {
         Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('settings/test-wa', [SettingsController::class, 'testWa'])->name('settings.test-wa');
     });
 });
 

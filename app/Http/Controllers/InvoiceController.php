@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Package;
 use App\Services\RadiusService;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -68,7 +69,13 @@ class InvoiceController extends Controller
             $validated['package_id'] = $customer->package_id;
         }
 
-        Invoice::create($validated);
+        $invoice = Invoice::create($validated);
+
+        if ($customer = Customer::find($invoice->customer_id)) {
+            app(WhatsAppService::class)->send($customer->tenant_id, $customer->phone,
+                "Halo {$customer->fullname}, tagihan baru sebesar Rp ".number_format($invoice->amount, 0, ',', '.')
+                .' telah dibuat. Jatuh tempo '.optional($invoice->due_date)->format('d/m/Y').'.');
+        }
 
         return redirect()->route('invoices.index')
             ->with('success', 'Invoice berhasil dibuat.');
@@ -166,5 +173,9 @@ class InvoiceController extends Controller
         $customer->save();
 
         app(RadiusService::class)->activateCustomer($customer);
+
+        app(WhatsAppService::class)->send($customer->tenant_id, $customer->phone,
+            "Halo {$customer->fullname}, pembayaran Anda diterima. Layanan aktif kembali sampai "
+            .($customer->expiry_date?->format('d/m/Y') ?? '-').". Terima kasih.");
     }
 }
