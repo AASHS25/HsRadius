@@ -75,6 +75,9 @@
             gap: 10px;
         }
 
+        .voucher-grid.tpl-card { grid-template-columns: repeat(2, 1fr); }
+        .voucher-grid.tpl-thermal { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; }
+
         .voucher-card {
             border: 2px dashed #94a3b8;
             border-radius: 10px;
@@ -192,7 +195,7 @@
         </button>
     </div>
 
-    <div class="voucher-grid">
+    <div class="voucher-grid tpl-{{ $template ?? 'default' }}">
         @foreach($vouchers ?? [] as $voucher)
             <div class="voucher-card">
                 <div class="brand">HsRadius</div>

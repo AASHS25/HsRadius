@@ -413,6 +413,9 @@
             <a href="{{ route('subscriptions.index') }}" class="nav-link {{ request()->routeIs('subscriptions.*') ? 'active' : '' }}">
                 <i class="bi bi-cash-coin"></i> Tagihan Tenant
             </a>
+            <a href="{{ route('balance.index') }}" class="nav-link {{ request()->routeIs('balance.index') ? 'active' : '' }}">
+                <i class="bi bi-wallet2"></i> Saldo Tenant
+            </a>
             @endcan
 
             <div class="nav-label">Menu Utama</div>
@@ -455,6 +458,11 @@
             <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                 <i class="bi bi-receipt"></i> Invoice
             </a>
+            @if(auth()->user()?->tenant_id)
+            <a href="{{ route('balance.mine') }}" class="nav-link {{ request()->routeIs('balance.mine') ? 'active' : '' }}">
+                <i class="bi bi-wallet2"></i> Saldo
+            </a>
+            @endif
             @endcan
 
             @can('view-reports')

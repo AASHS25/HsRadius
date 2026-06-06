@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Tenant extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'domain', 'status', 'plan_id',
+        'name', 'slug', 'domain', 'status', 'plan_id', 'balance',
         'trial_ends_at', 'subscription_ends_at', 'settings',
     ];
 
@@ -19,6 +20,7 @@ class Tenant extends Model
             'trial_ends_at' => 'datetime',
             'subscription_ends_at' => 'datetime',
             'settings' => 'array',
+            'balance' => 'decimal:2',
         ];
     }
 
@@ -40,6 +42,26 @@ class Tenant extends Model
     public function tenantInvoices(): HasMany
     {
         return $this->hasMany(TenantInvoice::class);
+    }
+
+    public function balanceTransactions(): HasMany
+    {
+        return $this->hasMany(TenantBalanceTransaction::class)->latest();
+    }
+
+    public function adjustBalance(float $amount, string $type, ?string $description = null): void
+    {
+        DB::transaction(function () use ($amount, $type, $description) {
+            $this->balance = (float) $this->balance + $amount;
+            $this->save();
+
+            $this->balanceTransactions()->create([
+                'amount' => $amount,
+                'type' => $type,
+                'description' => $description,
+                'balance_after' => $this->balance,
+            ]);
+        });
     }
 
     public function isActive(): bool

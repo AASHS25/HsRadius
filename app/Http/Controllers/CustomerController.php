@@ -8,6 +8,7 @@ use App\Models\Package;
 use App\Services\MikrotikService;
 use App\Services\RadiusService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
@@ -50,6 +51,66 @@ class CustomerController extends Controller
         $packages = Package::where('is_active', true)->get();
 
         return view('customers.index', compact('customers', 'packages'));
+    }
+
+    public function export()
+    {
+        $customers = Customer::with('package')->get();
+        $filename = 'pelanggan-'.now()->format('Ymd-His').'.csv';
+
+        return response()->streamDownload(function () use ($customers) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['username', 'password', 'fullname', 'email', 'phone', 'service_type', 'package_id', 'status', 'expiry_date']);
+            foreach ($customers as $c) {
+                fputcsv($out, [$c->username, $c->password, $c->fullname, $c->email, $c->phone, $c->service_type, $c->package_id, $c->status, optional($c->expiry_date)->toDateString()]);
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|file|mimes:csv,txt']);
+
+        $handle = fopen($request->file('file')->getRealPath(), 'r');
+        $header = fgetcsv($handle);
+        $created = 0;
+        $skipped = 0;
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (! is_array($header) || count($row) !== count($header)) {
+                $skipped++;
+                continue;
+            }
+            $data = array_combine($header, $row);
+            $username = trim($data['username'] ?? '');
+            $packageId = $data['package_id'] ?? null;
+
+            $dupe = $username !== '' && Customer::withoutGlobalScopes()->where('username', $username)->exists();
+            $validPackage = $packageId && Package::where('id', $packageId)->exists();
+
+            if ($username === '' || $dupe || ! $validPackage) {
+                $skipped++;
+                continue;
+            }
+
+            $customer = Customer::create([
+                'username' => $username,
+                'password' => ($data['password'] ?? '') ?: Str::upper(Str::random(8)),
+                'fullname' => ($data['fullname'] ?? '') ?: $username,
+                'email' => $data['email'] ?? null,
+                'phone' => $data['phone'] ?? null,
+                'service_type' => in_array($data['service_type'] ?? '', ['hotspot', 'pppoe']) ? $data['service_type'] : 'hotspot',
+                'package_id' => $packageId,
+                'status' => 'active',
+                'start_date' => now(),
+            ]);
+            $this->radiusService->createCustomer($customer);
+            $created++;
+        }
+        fclose($handle);
+
+        return redirect()->route('customers.index')->with('success', "$created pelanggan diimpor, $skipped dilewati.");
     }
 
     public function create()

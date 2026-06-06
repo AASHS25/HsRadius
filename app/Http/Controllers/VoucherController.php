@@ -122,7 +122,10 @@ class VoucherController extends Controller
                 ->get();
         }
 
-        return view('vouchers.print', compact('vouchers'));
+        $template = in_array($request->input('template'), ['default', 'card', 'thermal'])
+            ? $request->input('template') : 'default';
+
+        return view('vouchers.print', compact('vouchers', 'template'));
     }
 
     /**

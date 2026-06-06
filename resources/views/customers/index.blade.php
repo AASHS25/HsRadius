@@ -13,9 +13,36 @@
             </ol>
         </nav>
     </div>
-    <a href="{{ route('customers.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i> Tambah Pelanggan
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('customers.export') }}" class="btn btn-outline-secondary"><i class="bi bi-download me-1"></i> Export</a>
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importModal"><i class="bi bi-upload me-1"></i> Import</button>
+        <a href="{{ route('customers.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Tambah Pelanggan
+        </a>
+    </div>
+</div>
+
+{{-- Import Modal --}}
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('customers.import') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Pelanggan (CSV)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">Kolom: <code>username,password,fullname,email,phone,service_type,package_id,status,expiry_date</code>. Tip: Export dulu sebagai contoh format.</p>
+                    <input type="file" name="file" class="form-control" accept=".csv,.txt" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {{-- Filter --}}

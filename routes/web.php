@@ -13,6 +13,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TenantBalanceController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
@@ -39,10 +40,15 @@ Route::middleware('auth')->group(function () {
         Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
         Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
         Route::post('subscriptions/{invoice}/pay', [SubscriptionController::class, 'pay'])->name('subscriptions.pay');
+
+        Route::get('tenant-balance', [TenantBalanceController::class, 'index'])->name('balance.index');
+        Route::post('tenant-balance/topup', [TenantBalanceController::class, 'topUp'])->name('balance.topup');
     });
 
     // Customers (admin + operator)
     Route::middleware('can:manage-customers')->group(function () {
+        Route::get('customers/export', [CustomerController::class, 'export'])->name('customers.export');
+        Route::post('customers/import', [CustomerController::class, 'import'])->name('customers.import');
         Route::resource('customers', CustomerController::class);
         Route::post('customers/{customer}/suspend', [CustomerController::class, 'suspend'])->name('customers.suspend');
         Route::post('customers/{customer}/activate', [CustomerController::class, 'activate'])->name('customers.activate');
@@ -84,6 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:manage-billing')->group(function () {
         Route::resource('invoices', InvoiceController::class);
         Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'markPaid'])->name('invoices.pay');
+        Route::get('saldo', [TenantBalanceController::class, 'mine'])->name('balance.mine');
     });
 
     // Reports (admin + operator)

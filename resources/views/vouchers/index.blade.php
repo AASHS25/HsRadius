@@ -77,7 +77,12 @@
                 </div>
                 <span class="text-muted small" id="selectedCount"></span>
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 align-items-center">
+                <select name="template" class="form-select form-select-sm" style="width:auto;" title="Template cetak">
+                    <option value="default">Grid 4</option>
+                    <option value="card">Kartu</option>
+                    <option value="thermal">Thermal</option>
+                </select>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btnPrintSelected">
                     <i class="bi bi-printer me-1"></i> Print Terpilih
                 </button>
