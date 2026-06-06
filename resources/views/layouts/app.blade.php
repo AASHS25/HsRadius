@@ -408,30 +408,43 @@
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
 
+            @can('manage-customers')
             <a href="{{ route('customers.index') }}" class="nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Pelanggan
             </a>
+            @endcan
 
+            @can('manage-packages')
             <a href="{{ route('packages.index') }}" class="nav-link {{ request()->routeIs('packages.*') ? 'active' : '' }}">
                 <i class="bi bi-box"></i> Paket Layanan
             </a>
+            @endcan
 
+            @can('manage-nas')
             <a href="{{ route('nas.index') }}" class="nav-link {{ request()->routeIs('nas.*') ? 'active' : '' }}">
                 <i class="bi bi-router"></i> NAS/Router
             </a>
+            @endcan
 
+            @can('manage-vouchers')
             <a href="{{ route('vouchers.index') }}" class="nav-link {{ request()->routeIs('vouchers.*') ? 'active' : '' }}">
                 <i class="bi bi-ticket-perforated"></i> Voucher
             </a>
+            @endcan
 
+            @can('manage-sessions')
             <a href="{{ route('sessions.index') }}" class="nav-link {{ request()->routeIs('sessions.*') ? 'active' : '' }}">
                 <i class="bi bi-wifi"></i> Sesi Aktif
             </a>
+            @endcan
 
+            @can('manage-billing')
             <a href="{{ route('invoices.index') }}" class="nav-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                 <i class="bi bi-receipt"></i> Invoice
             </a>
+            @endcan
 
+            @can('view-reports')
             <div class="nav-label">Laporan</div>
 
             <a href="#laporanSubmenu" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}">
@@ -457,6 +470,7 @@
                     </li>
                 </ul>
             </div>
+            @endcan
         </div>
     </nav>
 

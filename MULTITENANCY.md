@@ -67,7 +67,7 @@ DB (1 instance per tenant / routing kompleks) → beban operasional tinggi.
 |---|---|---|
 | **1. Fondasi** | Tabel `tenants`, `Tenant` model, `users.tenant_id`+`role`, trait+scope, `CurrentTenant`, seeder super-admin+tenant demo | ✅ **Selesai (PR ini)** |
 | **2. Isolasi data app** | `tenant_id` di `customers/packages/vouchers/invoices/nas`, trait `BelongsToTenant`, middleware `ResolveTenant` (dari user login), auto-scope query | ✅ **Selesai (PR ini)** |
-| **3. Role & akses** | Gate/policy: super-admin vs admin vs operator; sembunyikan menu Landlord dari tenant | ⏳ |
+| **3. Role & akses** | Gate super-admin/admin/operator, route ber-`can:`, menu sidebar ber-`@can`, seeder operator | ✅ **Selesai (PR ini)** |
 | **4. RADIUS tenant-aware** | `tenant_id` ke tabel RADIUS, update `RadiusService`, ubah query FreeRADIUS berbasis NAS, namespacing username | ⏳ |
 | **5. Panel Landlord** | UI kelola tenant + onboarding (buat tenant + subdomain + admin) | ⏳ |
 | **6. Billing tenant** | Paket langganan SaaS, invoice tenant, auto-suspend, halaman pembayaran | ⏳ |

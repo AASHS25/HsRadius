@@ -38,6 +38,14 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        \App\Models\User::factory()->create([
+            'name' => 'Operator Demo ISP',
+            'email' => 'operator@demo.local',
+            'password' => Hash::make('admin123'),
+            'tenant_id' => $demoTenant->id,
+            'role' => 'operator',
+        ]);
+
         // From here on, all seeded data belongs to the demo tenant.
         app(\App\Tenancy\CurrentTenant::class)->set($demoTenant);
 
