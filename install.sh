@@ -10,7 +10,7 @@ echo ""
 
 # Check PHP
 if ! command -v php &> /dev/null; then
-    echo "ERROR: PHP is not installed. Please install PHP 8.3+"
+    echo "ERROR: PHP is not installed. Please install PHP 8.5+"
     exit 1
 fi
 

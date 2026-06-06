@@ -15,7 +15,7 @@ Aplikasi manajemen RADIUS untuk ribuan pelanggan Hotspot dan PPPoE dengan NAS Mi
 
 ## Tech Stack
 
-- **Backend**: Laravel 12 (PHP 8.3+)
+- **Backend**: Laravel 13 (PHP 8.5+)
 - **Database**: MySQL 8.0
 - **RADIUS**: FreeRADIUS 3.x
 - **NAS**: MikroTik RouterOS API
@@ -50,7 +50,7 @@ docker compose exec app php artisan db:seed
 ## Instalasi Manual
 
 ### Prasyarat
-- PHP 8.3+
+- PHP 8.5+
 - MySQL 8.0+
 - FreeRADIUS 3.x
 - Composer
