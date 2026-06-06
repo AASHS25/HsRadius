@@ -33,6 +33,17 @@ class LoginController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+
+            // Block sign-in for users whose tenant is suspended (super-admin has none).
+            if ($user->tenant && $user->tenant->status === 'suspended') {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'email' => 'Akun tenant Anda sedang ditangguhkan. Hubungi administrator.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard'))

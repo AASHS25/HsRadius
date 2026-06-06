@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class TenantController extends Controller
 
     public function create()
     {
-        return view('tenants.form');
+        return view('tenants.form', ['plans' => Plan::where('is_active', true)->orderBy('price')->get()]);
     }
 
     public function store(Request $request)
@@ -28,7 +29,7 @@ class TenantController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|alpha_dash|max:255|unique:tenants,slug',
             'status' => 'required|in:active,trial,suspended',
-            'plan' => 'nullable|string|max:255',
+            'plan_id' => 'nullable|exists:plans,id',
             'admin_name' => 'required|string|max:255',
             'admin_email' => 'required|email|max:255|unique:users,email',
             'admin_password' => 'required|string|min:6',
@@ -39,7 +40,7 @@ class TenantController extends Controller
                 'name' => $validated['name'],
                 'slug' => $validated['slug'],
                 'status' => $validated['status'],
-                'plan' => $validated['plan'] ?? null,
+                'plan_id' => $validated['plan_id'] ?? null,
             ]);
 
             User::create([
@@ -57,7 +58,10 @@ class TenantController extends Controller
 
     public function edit(Tenant $tenant)
     {
-        return view('tenants.form', compact('tenant'));
+        return view('tenants.form', [
+            'tenant' => $tenant,
+            'plans' => Plan::where('is_active', true)->orderBy('price')->get(),
+        ]);
     }
 
     public function update(Request $request, Tenant $tenant)
@@ -66,7 +70,7 @@ class TenantController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|alpha_dash|max:255|unique:tenants,slug,'.$tenant->id,
             'status' => 'required|in:active,trial,suspended',
-            'plan' => 'nullable|string|max:255',
+            'plan_id' => 'nullable|exists:plans,id',
         ]);
 
         $tenant->update($validated);

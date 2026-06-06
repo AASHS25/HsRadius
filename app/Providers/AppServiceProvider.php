@@ -15,6 +15,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+
         // Super-admin (landlord) bypasses every gate.
         Gate::before(fn (User $user) => $user->isSuperAdmin() ? true : null);
 

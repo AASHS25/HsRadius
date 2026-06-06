@@ -62,6 +62,14 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
+        // Enforce the tenant's SaaS plan customer limit.
+        $tenant = app(\App\Tenancy\CurrentTenant::class)->get();
+        if ($tenant && $tenant->plan && $tenant->plan->max_customers !== null
+            && Customer::count() >= $tenant->plan->max_customers) {
+            return back()->withInput()->with('error',
+                "Batas pelanggan paket \"{$tenant->plan->name}\" ({$tenant->plan->max_customers}) sudah tercapai. Upgrade paket untuk menambah pelanggan.");
+        }
+
         $validated = $request->validate([
             'fullname' => 'required|string|max:128',
             'username' => 'required|string|max:64|unique:customers,username',

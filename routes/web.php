@@ -6,7 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NasController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\VoucherController;
@@ -28,6 +30,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('tenants', TenantController::class)->except(['show']);
         Route::post('tenants/{tenant}/suspend', [TenantController::class, 'suspend'])->name('tenants.suspend');
         Route::post('tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
+
+        // SaaS billing (landlord)
+        Route::resource('plans', PlanController::class)->except(['show']);
+        Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+        Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
+        Route::post('subscriptions/{invoice}/pay', [SubscriptionController::class, 'pay'])->name('subscriptions.pay');
     });
 
     // Customers (admin + operator)

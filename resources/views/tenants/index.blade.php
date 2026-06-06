@@ -40,7 +40,7 @@
                             <td>{{ $i + 1 }}</td>
                             <td class="fw-semibold">{{ $tenant->name }}</td>
                             <td><code>{{ $tenant->slug }}</code></td>
-                            <td>{{ $tenant->plan ?? '-' }}</td>
+                            <td>{{ $tenant->plan?->name ?? '-' }}</td>
                             <td>
                                 @switch($tenant->status)
                                     @case('active') <span class="badge bg-success">Aktif</span> @break

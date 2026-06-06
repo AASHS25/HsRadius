@@ -39,8 +39,15 @@
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Plan (opsional)</label>
-                    <input type="text" name="plan" class="form-control" value="{{ old('plan', $tenant->plan ?? '') }}" placeholder="mis: basic / pro">
+                    <label class="form-label">Paket SaaS</label>
+                    <select name="plan_id" class="form-select">
+                        <option value="">— Tanpa paket —</option>
+                        @foreach($plans as $p)
+                            <option value="{{ $p->id }}" {{ (string) old('plan_id', $tenant->plan_id ?? '') === (string) $p->id ? 'selected' : '' }}>
+                                {{ $p->name }} (Rp {{ number_format($p->price, 0, ',', '.') }}/{{ $p->interval }})
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 

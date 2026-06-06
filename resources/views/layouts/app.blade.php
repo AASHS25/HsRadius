@@ -407,6 +407,12 @@
             <a href="{{ route('tenants.index') }}" class="nav-link {{ request()->routeIs('tenants.*') ? 'active' : '' }}">
                 <i class="bi bi-building"></i> Kelola Tenant
             </a>
+            <a href="{{ route('plans.index') }}" class="nav-link {{ request()->routeIs('plans.*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam"></i> Paket SaaS
+            </a>
+            <a href="{{ route('subscriptions.index') }}" class="nav-link {{ request()->routeIs('subscriptions.*') ? 'active' : '' }}">
+                <i class="bi bi-cash-coin"></i> Tagihan Tenant
+            </a>
             @endcan
 
             <div class="nav-label">Menu Utama</div>

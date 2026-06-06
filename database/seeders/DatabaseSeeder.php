@@ -22,12 +22,22 @@ class DatabaseSeeder extends Seeder
             'role' => 'super_admin',
         ]);
 
+        // SaaS plans (the landlord sells these to tenants)
+        \App\Models\Plan::create([
+            'name' => 'Basic', 'price' => 100000, 'interval' => 'monthly',
+            'max_customers' => 50, 'is_active' => true,
+        ]);
+        $pro = \App\Models\Plan::create([
+            'name' => 'Pro', 'price' => 250000, 'interval' => 'monthly',
+            'max_customers' => null, 'is_active' => true, // unlimited
+        ]);
+
         // Demo tenant + its admin (Phase 1 scaffold)
         $demoTenant = \App\Models\Tenant::create([
             'name' => 'Demo ISP',
             'slug' => 'demo',
             'status' => 'active',
-            'plan' => 'pro',
+            'plan_id' => $pro->id,
         ]);
 
         \App\Models\User::factory()->create([
