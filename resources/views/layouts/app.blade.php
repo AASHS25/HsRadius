@@ -402,6 +402,13 @@
         </div>
 
         <div class="sidebar-nav">
+            @can('manage-tenants')
+            <div class="nav-label">Landlord</div>
+            <a href="{{ route('tenants.index') }}" class="nav-link {{ request()->routeIs('tenants.*') ? 'active' : '' }}">
+                <i class="bi bi-building"></i> Kelola Tenant
+            </a>
+            @endcan
+
             <div class="nav-label">Menu Utama</div>
 
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">

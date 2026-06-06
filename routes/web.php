@@ -8,6 +8,7 @@ use App\Http\Controllers\NasController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TenantController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,13 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard (all authenticated roles)
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Landlord — tenant management (super-admin only)
+    Route::middleware('can:manage-tenants')->group(function () {
+        Route::resource('tenants', TenantController::class)->except(['show']);
+        Route::post('tenants/{tenant}/suspend', [TenantController::class, 'suspend'])->name('tenants.suspend');
+        Route::post('tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
+    });
 
     // Customers (admin + operator)
     Route::middleware('can:manage-customers')->group(function () {

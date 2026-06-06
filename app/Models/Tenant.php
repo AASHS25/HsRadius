@@ -26,6 +26,11 @@ class Tenant extends Model
         return $this->hasMany(User::class);
     }
 
+    public function customers(): HasMany
+    {
+        return $this->hasMany(Customer::class);
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active'
